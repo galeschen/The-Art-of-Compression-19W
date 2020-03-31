@@ -6,5 +6,3 @@ Edited files:
 - stats.cpp
 - twoDtree.cpp
 - twoDtree.h
-
-Gradescope: 49/49
