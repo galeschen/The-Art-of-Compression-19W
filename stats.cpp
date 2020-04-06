@@ -3,8 +3,14 @@
 #include <cmath>
 
 
+/**
+ * Initialize the private vectors so that for each color, entry 
+ * (x,y) is the cumulative sum of the the color values from (0,0)
+ * to (x,y).
+ * Similarly, the sumSq vectors are the cumulative sum of squares
+ * from (0,0) to (x,y).
+ */
 stats::stats(PNG & im){
-// YOUR CODE HERE!!
 	//initialize vectors
 	sumRed.resize(im.height(), vector<long> (im.width(),0));
 	sumGreen.resize(im.height(), vector<long> (im.width(),0));
@@ -51,22 +57,41 @@ stats::stats(PNG & im){
 	}
 }
 
-
+/** 
+ * Returns the sums of all pixel values across all color channels.
+ * useful in computing the score of a rectangle
+ * PA3 function
+ * @param channel is one of r, g, or b
+ * @param ul is (x,y) of the upper left corner of the rectangle 
+ * @param lr is (x,y) of the lower right corner of the rectangle
+ */
 long stats::getSum(char channel, pair<int,int> ul, pair<int,int> lr)
 {
-	// YOUR CODE HERE!!
 	return getSumHelper(false, channel, ul, lr);
 }
 
+/** 
+ * Returns the sums of squares of all pixel values across all color channels.
+ * useful in computing the score of a rectangle
+ * PA3 function
+ * @param channel is one of r, g, or b
+ * @param ul is (x,y) of the upper left corner of the rectangle 
+ * @param lr is (x,y) of the lower right corner of the rectangle
+ */
 long stats::getSumSq(char channel, pair<int,int> ul, pair<int,int> lr)
 {
-	// YOUR CODE HERE!!
 	return getSumHelper(true, channel, ul, lr);
 }
 
+/**
+ * Helper function for getSum and getSumSq
+ * @param square if true, returns sumSq, if false returns Sum
+ * @param channel is one of r, g, or b
+ * @param ul is (x,y) of the upper left corner of the rectangle 
+ * @param lr is (x,y) of the lower right corner of the rectangle
+ */
 long stats::getSumHelper(bool square, char channel, pair<int,int> ul, pair<int,int> lr)
 {
-	// added helper fn
 	vector< vector< long >> s;
 
 	if (square) {
@@ -102,27 +127,24 @@ long stats::getSumHelper(bool square, char channel, pair<int,int> ul, pair<int,i
 
 long stats::rectArea(pair<int,int> ul, pair<int,int> lr){
 // YOUR CODE HERE!!
-	return (lr.first - ul.first + 1) * (lr.second - ul.second + 1);
+	long area = (lr.first - ul.first + 1) * (lr.second - ul.second + 1);
+	return area;
 }
 
 // given a rectangle, compute its sum of squared deviations from mean, over all color channels.
 long stats::getScore(pair<int,int> ul, pair<int,int> lr){
 // YOUR CODE HERE!!
-	long redSq = getSumSq('r',ul,lr);
-	long greenSq = getSumSq('g',ul,lr);
-	long blueSq = getSumSq('b',ul,lr);
+	long rsq = getSumSq('r',ul,lr);
+	long gsq = getSumSq('g',ul,lr);
+	long bsq = getSumSq('b',ul,lr);
 
-	long redSum = getSum('r',ul,lr);
-	long greenSum = getSum('g',ul,lr);
-	long blueSum = getSum('b',ul,lr);
+	long rsum = getSum('r',ul,lr);
+	long gsum = getSum('g',ul,lr);
+	long bsum = getSum('b',ul,lr);
 	
 	long area = rectArea(ul,lr);
 
-	long redScore = redSq - (pow(redsum, 2) / area);
-	long greenScore = greenSq - (pow(greensum, 2) / area);
-	long blueScore = blueSq - (pow(bluesum, 2) / area);
-
-    return redScore + greenScore + blueScore;
+    return rsq - (pow(rsum, 2) / area) + gsq - (pow(gsum, 2) / area) + bsq - (pow(bsum, 2) / area);
 
 }
 		
@@ -130,9 +152,9 @@ RGBAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
 // YOUR CODE HERE!!
     long area = rectArea(ul, lr);
 
-	long redAvg = getSum('r',ul,lr)/area;
-	long greenAvg = getSum('g',ul,lr)/area;
-	long blueAvg = getSum('b',ul,lr)/area;
+	long ravg = getSum('r',ul,lr)/area;
+	long gavg = getSum('g',ul,lr)/area;
+	long bavg = getSum('b',ul,lr)/area;
 
-	return RGBAPixel(redAvg,greenAvg,blueAvg);
+	return RGBAPixel(ravg,gavg,bavg);
 }
