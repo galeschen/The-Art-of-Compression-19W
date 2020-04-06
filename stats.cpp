@@ -51,95 +51,53 @@ stats::stats(PNG & im){
 	}
 }
 
-long stats::getSum(char channel, pair<int,int> ul, pair<int,int> lr){
-// YOUR CODE HERE!!
-    if (ul.first == 0 && ul.second == 0) {
-        if (channel == 'r') {
-			return sumRed[lr.second][lr.first];
-		}
-        if (channel == 'g') {
-			return sumGreen[lr.second][lr.first];
-		}
-        if (channel == 'b') {
-			return sumBlue[lr.second][lr.first];
-		}
-    } else if (ul.second == 0) {
-        if (channel == 'r') {
-			return sumRed[lr.second][lr.first] - sumRed[lr.second][ul.first - 1];
-		}
-        if (channel == 'g') {
-			return sumGreen[lr.second][lr.first] - sumGreen[lr.second][ul.first - 1];
-		}
-        if (channel == 'b') {
-			return sumBlue[lr.second][lr.first] - sumBlue[lr.second][ul.first - 1];
-		}
-    } else if (ul.first == 0) {
-        if (channel == 'r') {
-			return sumRed[lr.second][lr.first] - sumRed[ul.second - 1][lr.first];
-		}
-        if (channel == 'g') {
-			return sumGreen[lr.second][lr.first] - sumGreen[ul.second - 1][lr.first];
-		}
-        if (channel == 'b') {
-			return sumBlue[lr.second][lr.first] - sumBlue[ul.second - 1][lr.first];
-		}
-    } else {
-        if (channel == 'r') {
-			return sumRed[lr.second][lr.first] - sumRed[ul.second - 1][lr.first] - sumRed[lr.second][ul.first - 1] + sumRed[ul.second - 1][ul.first - 1];
-		}
-        if (channel == 'g') {
-			return sumGreen[lr.second][lr.first] - sumGreen[ul.second - 1][lr.first] - sumGreen[lr.second][ul.first - 1] + sumGreen[ul.second - 1][ul.first - 1];
-		}
-        if (channel == 'b') {
-			return sumBlue[lr.second][lr.first] - sumBlue[ul.second - 1][lr.first] - sumBlue[lr.second][ul.first - 1] + sumBlue[ul.second - 1][ul.first - 1];
-		}
-    }
 
+long stats::getSum(char channel, pair<int,int> ul, pair<int,int> lr)
+{
+	// YOUR CODE HERE!!
+	return getSumHelper(false, channel, ul, lr);
 }
 
-long stats::getSumSq(char channel, pair<int,int> ul, pair<int,int> lr){
-// YOUR CODE HERE!!
-    if(ul.first == 0 && ul.second == 0){
-        if (channel == 'r') {
-			return sumsqRed[lr.second][lr.first];
+long stats::getSumSq(char channel, pair<int,int> ul, pair<int,int> lr)
+{
+	// YOUR CODE HERE!!
+	return getSumHelper(true, channel, ul, lr);
+}
+
+long stats::getSumHelper(bool square, char channel, pair<int,int> ul, pair<int,int> lr)
+{
+	// added helper fn
+	vector< vector< long >> s;
+
+	if (square) {
+		if (channel == 'r') {
+        	s = sumsqRed;
+    	} else if (channel == 'g') {
+        	s = sumsqGreen;
+    	} else if (channel == 'b') {
+        	s = sumsqBlue;
+    	}
+		
+	} else {
+		if (channel == 'r') {
+			s = sumRed;
+		} else if (channel == 'g') {
+			s = sumGreen;
+		} else if (channel == 'b') {
+			s = sumBlue;
 		}
-        if (channel == 'g') {
-			return sumsqGreen[lr.second][lr.first];
-		}
-        if (channel == 'b') {
-			return sumsqBlue[lr.second][lr.first];
-		}
-    }  else if (ul.second == 0){
-        if (channel == 'r') {
-			return sumsqRed[lr.second][lr.first] - sumsqRed[lr.second][ul.first - 1];
-		}
-        if (channel == 'g') {
-			return sumsqGreen[lr.second][lr.first] - sumsqGreen[lr.second][ul.first - 1];
-		}
-        if (channel == 'b') {
-			return sumsqBlue[lr.second][lr.first] - sumsqBlue[lr.second][ul.first - 1];
-		}
-    } else if (ul.first == 0){
-        if (channel == 'r') {
-		return sumsqRed[lr.second][lr.first] - sumsqRed[ul.second - 1][lr.first];
-		}
-        if (channel == 'g') {
-			return sumsqGreen[lr.second][lr.first] - sumsqGreen[ul.second - 1][lr.first];
-		}
-        if (channel == 'b') {
-			return sumsqBlue[lr.second][lr.first] - sumsqBlue[ul.second - 1][lr.first];
-		}
-    } else {
-        if (channel == 'r') {
-			return sumsqRed[lr.second][lr.first] - sumsqRed[ul.second - 1][lr.first] - sumsqRed[lr.second][ul.first - 1] + sumsqRed[ul.second - 1][ul.first - 1];
-		}
-        if (channel == 'g') {
-			return sumsqGreen[lr.second][lr.first] - sumsqGreen[ul.second - 1][lr.first] - sumsqGreen[lr.second][ul.first - 1] + sumsqGreen[ul.second - 1][ul.first - 1];
-		}
-        if (channel == 'b') {
-			return sumsqBlue[lr.second][lr.first] - sumsqBlue[ul.second - 1][lr.first] - sumsqBlue[lr.second][ul.first - 1] + sumsqBlue[ul.second - 1][ul.first - 1];
-		}
-    }
+	}
+    
+	// getting sums
+	if (ul.first == 0 && ul.second == 0) {
+		return s[lr.second][lr.first];
+	} else if (ul.second == 0) {
+		return s[lr.second][lr.first] - s[lr.second][ul.first - 1];
+	} else if (ul.first == 0) {
+		return s[lr.second][lr.first] - s[ul.second - 1][lr.first];
+	} else {
+		return s[lr.second][lr.first] - s[ul.second - 1][lr.first] - s[lr.second][ul.first - 1] + s[ul.second - 1][ul.first - 1];
+	}
 }
 
 long stats::rectArea(pair<int,int> ul, pair<int,int> lr){
@@ -150,21 +108,21 @@ long stats::rectArea(pair<int,int> ul, pair<int,int> lr){
 // given a rectangle, compute its sum of squared deviations from mean, over all color channels.
 long stats::getScore(pair<int,int> ul, pair<int,int> lr){
 // YOUR CODE HERE!!
-	long redsq = getSumSq('r',ul,lr);
-	long greensq = getSumSq('g',ul,lr);
-	long bluesq = getSumSq('b',ul,lr);
+	long redSq = getSumSq('r',ul,lr);
+	long greenSq = getSumSq('g',ul,lr);
+	long blueSq = getSumSq('b',ul,lr);
 
-	long redsum = getSum('r',ul,lr);
-	long greensum = getSum('g',ul,lr);
-	long bluesum = getSum('b',ul,lr);
+	long redSum = getSum('r',ul,lr);
+	long greenSum = getSum('g',ul,lr);
+	long blueSum = getSum('b',ul,lr);
 	
 	long area = rectArea(ul,lr);
 
-	long red = redsq - (pow(redsum, 2) / area);
-	long green = greensq - (pow(greensum, 2) / area);
-	long blue = bluesq - (pow(bluesum, 2) / area);
+	long redScore = redSq - (pow(redsum, 2) / area);
+	long greenScore = greenSq - (pow(greensum, 2) / area);
+	long blueScore = blueSq - (pow(bluesum, 2) / area);
 
-    return red + green + blue;
+    return redScore + greenScore + blueScore;
 
 }
 		
@@ -172,9 +130,9 @@ RGBAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
 // YOUR CODE HERE!!
     long area = rectArea(ul, lr);
 
-	long redavg = getSum('r',ul,lr)/area;
-	long greenavg = getSum('g',ul,lr)/area;
-	long blueavg = getSum('b',ul,lr)/area;
+	long redAvg = getSum('r',ul,lr)/area;
+	long greenAvg = getSum('g',ul,lr)/area;
+	long blueAvg = getSum('b',ul,lr)/area;
 
-	return RGBAPixel(redavg,greenavg,blueavg);
+	return RGBAPixel(redAvg,greenAvg,blueAvg);
 }
